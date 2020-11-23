@@ -10,6 +10,8 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserFixtures extends Fixture
 {
+    const USER_COUNT = 40;
+
     private $userPasswordEncoder;
 
     public function __construct(UserPasswordEncoderInterface $userPasswordEncoder)
@@ -21,13 +23,16 @@ class UserFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
-        for($i = 0; $i < 40; $i++) {
+        $password = $this->userPasswordEncoder->encodePassword(new User(), 'user');
+
+        for($i = 0; $i < self::USER_COUNT; $i++) {
             $user = new User();
             $user->setEmail($faker->email);
             $user->setFirstname($faker->firstName);
             $user->setLastname($faker->lastName);
             $user->setDateInscription(new \DateTime());
-            $user->setPassword($this->userPasswordEncoder->encodePassword($user, 'user'));
+            $user->setPassword($password);
+            $this->addReference('user'.$i, $user);
             $manager->persist($user);
         }
 
